@@ -77,7 +77,7 @@ with open('settings.json', 'w') as fp:
 # читаем из файла
 with open('settings.json') as json_file:
     json_data = json.load(json_file)
-
+#проверка
 print(json_data)
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required = True)
