@@ -20,6 +20,7 @@ settings = {
     'secret_key': 'C://Users//matro//OneDrive//Рабочий стол//Учебники//ОИБ//Лаба 3//secret_key.pem',
 }
 
+
 def generate_keys(encrypted_symmetrical_key_path: str, open_asymmetric_key_path: str,
                   private_asymmetric_key_path: str) -> None:
     """
@@ -71,21 +72,16 @@ def generate_keys(encrypted_symmetrical_key_path: str, open_asymmetric_key_path:
         key_file.write(encrypted_symmetrical_key)
 
 
-
-with open('settings.json', 'w') as fp:
-    json.dump(settings, fp)
 # читаем из файла
+
+
+parser = argparse.ArgumentParser(description='main.py')
+
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-enc', '--encryption', help='Запускает режим шифрования')
+group.add_argument('-dec', '--decryption', help='Запускает режим дешифрования')
+args = parser.parse_args()
 with open('settings.json') as json_file:
     json_data = json.load(json_file)
-#проверка
-print(json_data)
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group(required = True)
-group.add_argument('-gen','--generation',help='Запускает режим генерации ключей')
-group.add_argument('-enc','--encryption',help='Запускает режим шифрования')
-group.add_argument('-dec','--decryption',help='Запускает режим дешифрования')
-
-args = parser.parse_args()
-if args.generation is not None:
-  # генерируем ключи
-else if args.encryption is not None:
+path_data = os.path.realpath()
+generate_keys(json_data['symmetric_key'],)
