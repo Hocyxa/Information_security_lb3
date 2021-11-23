@@ -63,14 +63,12 @@ def generate_key(encrypted_symmetric_key: str, public_key_path: str, secret_key_
         summetric_out.write(encrypt_symmetrical_key)
 
 
-"""
-parser = argparse.ArgumentParser()
-group = parser.add_mutually_exclusive_group(required = True)
-group.add_argument('-gen','--generation',help='Запускает режим генерации ключей')
-group.add_argument('-enc','--encryption',help='Запускает режим шифрования')
-group.add_argument('-dec','--decryption',help='Запускает режим дешифрования')
-"""
-
+parser = argparse.ArgumentParser(description="main")
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-gen', '--generation', help='Запускает режим генерации ключей')
+group.add_argument('-enc', '--encryption', help='Запускает режим шифрования')
+group.add_argument('-dec', '--decryption', help='Запускает режим дешифрования')
+args = parser.parse_args()
 # пишем в файл
 with open('settings.json', 'w') as fp:
     json.dump(settings, fp)
@@ -78,11 +76,7 @@ with open('settings.json', 'w') as fp:
 with open('settings.json') as json_file:
     json_data = json.load(json_file)
 
-generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'])
-"""args = parser.parse_args()
+args = parser.parse_args()
 if args.generation is not None:
-  # генерируем ключи
-else if args.encryption is not None:
-  # шифруем
-else:
-  # дешифруем"""
+    generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'])
+
