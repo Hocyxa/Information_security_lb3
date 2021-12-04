@@ -7,6 +7,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives import hashes
 import os
 import json
+from tqdm import tqdm
 import argparse
 import pickle
 
@@ -17,31 +18,29 @@ settings = {
     'symmetric_key': 'symmetric_key.txt',  # Симметричный ключ Camellia
     'public_key': 'public_key.pem',  # Открытый ключ RSA
     'secret_key': 'secret_key.pem',  # закрытый ключ RSA
-            }
+}
 
 
 def input_len_key() -> int:
     """
         Функция возвращает длину ключа для алгоритма Camellia
     """
-    while 1:
-        os.system('CLS')
-        print("Выберите длину ключа\n"
-              "1.128\n"
-              "2. 192\n"
-              "3. 256\n"
-              "Ваш выбор:")
-        alternative = input()
-        if int(alternative) == 1:
-            return int(128)
-        if int(alternative) == 2:
-            return int(192)
-        if int(alternative) == 3:
-            return int(256)
+    print("Выберите длину ключа\n"
+          "1. 128\n"
+          "2. 192\n"
+          "3. 256\n"
+          "Ваш выбор:")
+    alternative = input()
+    if int(alternative) == 1:
+        return int(128)
+    if int(alternative) == 2:
+        return int(192)
+    if int(alternative) == 3:
+        return int(256)
 
 
-def generate_key(encrypted_symmetric_key: str, public_key_path: str, secret_key_path: str) -> None:
-    symmetrical_key = algorithms.Camellia(os.urandom(int(input_len_key() / 8)))
+def generate_key(encrypted_symmetric_key: str, public_key_path: str, secret_key_path: str, len_key: int) -> None:
+    symmetrical_key = algorithms.Camellia(os.urandom(int(len_key / 8)))
     keys = rsa.generate_private_key(
         public_exponent=65537,
         key_size=2048
@@ -131,23 +130,27 @@ def decrypt_data(encrypted_text_file_path: str, secret_key_path: str, encrypted_
         file.write(final_text)
 
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='main.py')
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('-gen', '--generation', help='Запускает режим генерации ключей')
-group.add_argument('-enc', '--encryption', help='Запускает режим шифрования')
-group.add_argument('-dec', '--decryption', help='Запускает режим дешифрования')
+group.add_argument('-e', '--encryption', help='Шифрование файла', default=None, dest='enc')
+group.add_argument('-d', '--decryption', help='Дешифрование файла', default=None, dest='dec')
+group.add_argument('-g', '--generate', help='Генерация ключей', default=None, dest='gen')
 args = parser.parse_args()
-with open('settings.json') as json_file:
-    json_data = json.load(json_file)
 if args.generation is not None:
-    generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'])
-    print('Ключ успешно сгенерирован'+str(input_len_key()))
-
-if args.encryption is not None:
-    encrypt_data(json_data['initial_file'], json_data['secret_key'], json_data['symmetric_key'],
-                 json_data['encrypted_file'])
-    print('Данные были успешно зашифрованы!')
-if args.decryption is not None:
-    decrypt_data(json_data['encrypted_file'], json_data['secret_key'], json_data['symmetric_key'],
-                 json_data['decrypted_file'])
-    print('Данные были успешно дешифрованы!')
+    with open('settings.json') as json_file:
+        json_data = json.load(json_file)
+    len_key = input_len_key()
+    generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'], len_key)
+    print('Длина ключа равна - ' + str(len_key))
+if args.enc is not None:
+    with tqdm(100, desc='Encrypting your file: ') as progressbar:
+        encrypt_data(json_data['initial_file'], json_data['secret_key'], json_data['symmetric_key'],
+                     json_data['encrypted_path'])
+        progressbar.update(100)
+        print('Данные были успешно зашифрованы!')
+if args.dec is not None:
+    with tqdm(100, desc='Decrypting your file: ') as progressbar:
+        decrypt_data(json_data['encrypted_file'], json_data['secret_key'], json_data['symmetric_key'],
+                     json_data['decrypted_file'])
+        progressbar.update(100)
+        print('Данные были успешно дешифрованы!')
