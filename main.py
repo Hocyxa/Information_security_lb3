@@ -142,13 +142,13 @@ if args.generation is not None:
     len_key = input_len_key()
     generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'], len_key)
     print('Длина ключа равна - ' + str(len_key))
-if args.enc is not None:
+if args.encryption is not None:
     with tqdm(100, desc='Encrypting your file: ') as progressbar:
         encrypt_data(json_data['initial_file'], json_data['secret_key'], json_data['symmetric_key'],
-                     json_data['encrypted_path'])
+                     json_data['encrypted_file'])
         progressbar.update(100)
         print('Данные были успешно зашифрованы!')
-if args.dec is not None:
+if args.decryption is not None:
     with tqdm(100, desc='Decrypting your file: ') as progressbar:
         decrypt_data(json_data['encrypted_file'], json_data['secret_key'], json_data['symmetric_key'],
                      json_data['decrypted_file'])
