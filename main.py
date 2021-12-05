@@ -132,13 +132,13 @@ def decrypt_data(encrypted_text_file_path: str, secret_key_path: str, encrypted_
 
 parser = argparse.ArgumentParser(description='main.py')
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('-e', '--encryption', help='Шифрование файла', default=None, dest='enc')
-group.add_argument('-d', '--decryption', help='Дешифрование файла', default=None, dest='dec')
-group.add_argument('-g', '--generate', help='Генерация ключей', default=None, dest='gen')
+group.add_argument('-gen', '--generation', help='Запускает режим генерации ключей')
+group.add_argument('-enc', '--encryption', help='Запускает режим шифрования')
+group.add_argument('-dec', '--decryption', help='Запускает режим дешифрования')
 args = parser.parse_args()
+with open('settings.json') as json_file:
+    json_data = json.load(json_file)
 if args.generation is not None:
-    with open('settings.json') as json_file:
-        json_data = json.load(json_file)
     len_key = input_len_key()
     generate_key(json_data['symmetric_key'], json_data['public_key'], json_data['secret_key'], len_key)
     print('Длина ключа равна - ' + str(len_key))
@@ -147,10 +147,10 @@ if args.encryption is not None:
         encrypt_data(json_data['initial_file'], json_data['secret_key'], json_data['symmetric_key'],
                      json_data['encrypted_file'])
         progressbar.update(100)
-        print('Данные были успешно зашифрованы!')
+        print('\n Данные были успешно зашифрованы!\n')
 if args.decryption is not None:
     with tqdm(100, desc='Decrypting your file: ') as progressbar:
         decrypt_data(json_data['encrypted_file'], json_data['secret_key'], json_data['symmetric_key'],
                      json_data['decrypted_file'])
         progressbar.update(100)
-        print('Данные были успешно дешифрованы!')
+        print('\n Данные были успешно дешифрованы!\n')
